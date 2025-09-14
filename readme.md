@@ -1,4 +1,4 @@
-# Go gRPC Demo: MemeService
+# go-grpc-demo: MemeService
 
 A simple gRPC demo showcasing a MemeService with examples of unary, server-streaming, and client-streaming RPCs. This repository includes:
 - Server: cmd/server
