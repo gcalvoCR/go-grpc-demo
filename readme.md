@@ -3,7 +3,56 @@
 A simple gRPC demo showcasing a MemeService with examples of unary, server-streaming, and client-streaming RPCs. This repository includes:
 - Server: cmd/server
 - Client: cmd/client
-- Generated protobuf code: memespb
+- Generated protobuf code: memespb (from proto/memes.proto)
+
+## gRPC in Simple Words
+
+gRPC is a fast and efficient way for programs (services) to talk to each other, even if they’re written in different languages. You write a contract in a .proto file (what requests and responses look like), then tools generate code so both server and client can communicate without you writing boilerplate. Under the hood, gRPC uses HTTP/2 and Protocol Buffers (compact binary format).
+
+## Advantages
+- High performance: compact binary messages over HTTP/2.
+- Strongly typed contract: schema-first design (fewer integration surprises).
+- Code generation: stubs for client/server across many languages.
+- Streaming support: unary, server-streaming, client-streaming, and bidirectional.
+- Cross-language and cross-platform.
+- Production-ready features: deadlines, cancellation, interceptors, auth, load balancing.
+
+## Implementation Order (as used in this repo)
+
+1) Define the proto
+- File: `proto/memes.proto`
+- This is the single source of truth for request/response shapes and service methods.
+
+2) Generate the code using protoc
+- Generated Go files live in:
+  - `memespb/memes.pb.go`
+  - `memespb/memes_grpc.pb.go`
+- Re-run generation whenever you change `proto/memes.proto`.
+
+3) Implement the server
+- Files:
+  - `cmd/server/main.go` (server bootstrap and listener)
+  - `cmd/server/meme_server.go` (service implementation)
+
+4) Implement the client
+- File: `cmd/client/main.go` (simple client calling the RPCs defined in the proto)
+
+## Project Pointers
+- Proto: `proto/memes.proto`
+- Generated: `memespb/memes.pb.go`, `memespb/memes_grpc.pb.go`
+- Server: `cmd/server/main.go`, `cmd/server/meme_server.go`
+- Client: `cmd/client/main.go`
+
+## Prerequisites
+- Go 1.21+ installed
+- Protocol Buffers compiler (protoc)
+  - macOS: `brew install protobuf`
+- Protobuf Go plugins on your PATH:
+  ```sh
+  go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+  ```
+  Make sure `$GOPATH/bin` (or the Go install bin directory) is on your PATH.
 
 ## Getting Started
 Quickest way to run the demo locally.
@@ -38,23 +87,13 @@ make run-server
 
 For more options and flags, see the sections below.
 
-## Prerequisites
-- Go 1.21+ installed
-- Protocol Buffers compiler (protoc)
-  - macOS: `brew install protobuf`
-- Protobuf Go plugins on your PATH:
-  ```sh
-  go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-  ```
-  Make sure `$GOPATH/bin` (or the Go install bin directory) is on your PATH.
 
 ## Generate gRPC code from .proto
 Use the provided Makefile target:
 ```sh
 make compile
 ```
-This generates the Go code under memespb.
+This compiles proto/memes.proto and writes Go stubs into memespb/ via the Makefile.
 
 ## Run the server
 The server listens on :50051 and has server reflection enabled.
@@ -68,6 +107,8 @@ gRPC server listening on :50051
 
 ## Run the client
 The client connects to a gRPC server and supports four subcommands: random, list, stream, upload.
+
+Note: If you've built the client binary as 'client', you can use the general usage below; otherwise, use the 'go run ./cmd/client ...' examples that follow.
 
 General usage:
 ```
