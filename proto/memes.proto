@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package memes;
+
+option go_package = "github.com/gcalvocr/go-grpc-demo/memespb";
+
+service MemeService {
+  // Unary RPC: Get one random meme
+  rpc GetRandomMeme (MemeRequest) returns (MemeResponse);
+
+  // Unary RPC: Get memes by category
+  rpc GetMemesByCategory (CategoryRequest) returns (MemeList);
+
+  // Server streaming: Meme feed
+  rpc StreamMemes (StreamRequest) returns (stream MemeResponse);
+
+  // Client streaming: Upload memes in bulk
+  rpc UploadMemes (stream MemeUpload) returns (UploadSummary);
+}
+
+message MemeRequest {
+  string category = 1; // optional filter
+}
+
+message MemeResponse {
+  string id = 1;
+  string title = 2;
+  string url = 3;
+  string category = 4;
+}
+
+message CategoryRequest {
+  string category = 1;
+}
+
+message MemeList {
+  repeated MemeResponse memes = 1;
+}
+
+message StreamRequest {
+  string category = 1;
+}
+
+message MemeUpload {
+  string title = 1;
+  string url = 2;
+  string category = 3;
+}
+
+message UploadSummary {
+  int32 count = 1;
+  string message = 2;
+}
